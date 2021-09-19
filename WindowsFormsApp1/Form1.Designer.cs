@@ -118,6 +118,7 @@ namespace DQ8TextEditor
             // 
             // Form1
             // 
+            this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(737, 524);
@@ -129,6 +130,7 @@ namespace DQ8TextEditor
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.Text = "Dragon Quest VIII 3DS Text Editor";
+            this.DragDrop += new System.Windows.Forms.DragEventHandler(this.openToolStripMenuItem_Click);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);

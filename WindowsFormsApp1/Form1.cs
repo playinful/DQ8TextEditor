@@ -18,6 +18,11 @@ namespace DQ8TextEditor
         public Form1()
         {
             InitializeComponent();
+            string[] args = Environment.GetCommandLineArgs();
+            if (args.Length > 1)
+            {
+                tryOpenFile(args[1]);
+            }
         }
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
@@ -26,8 +31,12 @@ namespace DQ8TextEditor
             openFileDialog.Filter = "Dragon Quest VIII Message File (*.binE, *.binF, *.binG, *.binI, *.binS)|*.binE;*.binF;*.binG;*.binI;*.binS";
             openFileDialog.ShowDialog();
 
+            tryOpenFile(openFileDialog.FileName);
+        }
+        private void tryOpenFile (string filename)
+        {
             //try to load that file
-            ActiveFile.Load(openFileDialog.FileName);
+            ActiveFile.Load(filename);
             ActiveFile.ShowDetails(stringListBox, textBoxMain);
             EnableDisableControls();
         }
