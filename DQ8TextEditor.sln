@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31515.178
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DQ8TextEditor", "WindowsFormsApp1\DQ8TextEditor.csproj", "{EA379EC4-BBEB-4B88-BB1D-20A4ECA0B0B0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EA379EC4-BBEB-4B88-BB1D-20A4ECA0B0B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA379EC4-BBEB-4B88-BB1D-20A4ECA0B0B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA379EC4-BBEB-4B88-BB1D-20A4ECA0B0B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA379EC4-BBEB-4B88-BB1D-20A4ECA0B0B0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C5DA221E-88B0-4B70-B1D8-121D2CB5414C}
+	EndGlobalSection
+EndGlobal
