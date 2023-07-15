@@ -8,6 +8,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
+using System.Diagnostics;
 
 namespace DQ8TextEditor
 {
@@ -114,84 +117,185 @@ namespace DQ8TextEditor
                     Source = address;
 
                     byte[] file_data = File.ReadAllBytes(address);
-                    string file_text = File.ReadAllText(address);
+                    // string file_text = File.ReadAllText(address);
 
-                    int first_end_index = -1;
-                    for (int i = 0; i < file_data.Length; i++)
+                    int last_end_index = -1;
+                    int penultimate_end_index = -1;
+                    for (int i = file_data.Length - 5; i >= 0; i--)
                     {
-                        if (file_data[i].Equals(91) && file_data[i + 1].Equals(101) && file_data[i + 2].Equals(110) && file_data[i + 3].Equals(100) && file_data[i + 4].Equals(93))
+                        if (last_end_index < 0 && file_data[i].Equals(91) && file_data[i + 1].Equals(101) && file_data[i + 2].Equals(110) && file_data[i + 3].Equals(100) && file_data[i + 4].Equals(93))
                         {
-                            first_end_index = i;
+                            last_end_index = i;
+                            continue;
+                        }
+                        if (last_end_index >= 0 && file_data[i].Equals(91) && file_data[i + 1].Equals(101) && file_data[i + 2].Equals(110) && file_data[i + 3].Equals(100) && file_data[i + 4].Equals(93))
+                        {
+                            penultimate_end_index = i;
                             break;
                         }
                     }
 
-                    if (first_end_index > -1)
-                    {
-                        // find the second index
-                        int second_pointer_index = -1;
-                        for (int i = 0; i < file_data.Length - 4; i += 4)
-                        {
-                            byte[] bytes = new byte[4];
-                            Array.Copy(file_data, i, bytes, 0, 4);
-                            int j = BitConverter.ToInt32(bytes, 0);
-
-                            if (j == first_end_index + 5)
-                            {
-                                second_pointer_index = i;
-                                break;
-                            }
-                        }
-
-                        if (second_pointer_index > -1)
-                        {
-                            int first_pointer_index = second_pointer_index - 4;
-                            Header = new byte[first_pointer_index];
-                            Array.Copy(file_data, 0, Header, 0, first_pointer_index);
-
-                            byte[] fpi = new byte[4];
-                            Array.Copy(file_data, first_pointer_index, fpi, 0, 4);
-
-                            int first_string_index = BitConverter.ToInt32(fpi, 0);
-                            Pointers = new int[(first_string_index - first_pointer_index) / 4];
-                            for (int i = 0; i < Pointers.Length; i++)
-                            {
-                                byte[] bytes = new byte[4];
-                                Array.Copy(file_data, first_pointer_index + (i * 4), bytes, 0, 4);
-                                Pointers[i] = BitConverter.ToInt32(bytes, 0);
-                            }
-                            Strings = new List<string>();
-                            for (int i = 0; i < Pointers.Length; i++)
-                            {
-                                byte[] bytes;
-                                int len;
-                                if (i < Pointers.Length - 1)
-                                {
-                                    len = Pointers[i + 1] - Pointers[i];
-                                    bytes = new byte[len];
-                                }
-                                else
-                                {
-                                    len = file_data.Length - Pointers[i];
-                                    bytes = new byte[len];
-                                }
-                                Array.Copy(file_data, Pointers[i], bytes, 0, len);
-
-                                string str = System.Text.Encoding.Default.GetString(bytes);
-                                str = str.Substring(0, str.Length - 5);
-
-                                Strings.Add(str);
-                            }
-                        }
-                        else
-                        {
-                            MessageBox.Show("Not a valid Dragon Quest VIII text file.");
-                        }
-                    }
-                    else
+                    if (last_end_index <= -1 || penultimate_end_index <= -1)
                     {
                         MessageBox.Show("Not a valid Dragon Quest VIII text file.");
+                        return;
                     }
+
+                    int last_string_index = penultimate_end_index + 5;
+
+                    int last_pointer_index = -1;
+                    for (int i = file_data.Length - (file_data.Length % 4); i >= 0; i -= 4)
+                    {
+                        if (i + 4 >= file_data.Length)
+                            continue;
+
+                        byte[] bts;
+
+                        if (BitConverter.IsLittleEndian)
+                            bts = new byte[4] { file_data[i], file_data[i + 1], file_data[i + 2], file_data[i + 3] };
+                        else
+                            bts = new byte[4] { file_data[i + 3], file_data[i + 2], file_data[i + 1], file_data[i] };
+                        int frombytes = BitConverter.ToInt32(bts, 0);
+
+                        if (frombytes == last_string_index)
+                        {
+                            last_pointer_index = i;
+                        }
+                    }
+
+                    if (last_pointer_index <= -1)
+                    {
+                        MessageBox.Show("Not a valid Dragon Quest VIII text file.");
+                        return;
+                    }
+
+                    int first_string_index = last_pointer_index + 4;
+
+                    int first_pointer_index = -1;
+                    for (int i = last_pointer_index; i >= 0; i -= 4)
+                    {
+                        if (i + 4 >= file_data.Length)
+                            continue;
+
+                        byte[] bts;
+
+                        if (BitConverter.IsLittleEndian)
+                            bts = new byte[4] { file_data[i], file_data[i + 1], file_data[i + 2], file_data[i + 3] };
+                        else
+                            bts = new byte[4] { file_data[i + 3], file_data[i + 2], file_data[i + 1], file_data[i] };
+                        int frombytes = BitConverter.ToInt32(bts, 0);
+
+                        if (frombytes == first_string_index)
+                        {
+                            first_pointer_index = i;
+                        }
+                    }
+
+                    Header = new byte[first_pointer_index];
+                    for (int i = 0; i < Header.Length; i++)
+                    {
+                        Header[i] = file_data[i];
+                    }
+
+                    Pointers = new int[(first_string_index - first_pointer_index) / 4];
+                    for (int i = 0; i < Pointers.Length; i++)
+                    {
+                        byte[] bts;
+                        int ind = Header.Length + (i * 4);
+
+                        if (BitConverter.IsLittleEndian)
+                            bts = new byte[4] { file_data[ind], file_data[ind + 1], file_data[ind + 2], file_data[ind + 3] };
+                        else
+                            bts = new byte[4] { file_data[ind + 3], file_data[ind + 2], file_data[ind + 1], file_data[ind] };
+
+                        Pointers[i] = BitConverter.ToInt32(bts, 0);
+                    }
+
+                    Strings = new List<string>();
+                    foreach (int ptr in Pointers)
+                    {
+                        string str = Encoding.UTF8.GetString(file_data, ptr, file_data.Length - ptr);
+                        str = new Regex("[\\S\\s]*?(?=\\[end\\])").Match(str).Groups[0].Value;
+                        str = str.Replace("\n", "\r\n");
+                        Strings.Add(str);
+                    }
+
+                    //int first_end_index = -1;
+                    //for (int i = 0; i < file_data.Length; i++)
+                    //{
+                    //    if (file_data[i].Equals(91) && file_data[i + 1].Equals(101) && file_data[i + 2].Equals(110) && file_data[i + 3].Equals(100) && file_data[i + 4].Equals(93))
+                    //    {
+                    //        first_end_index = i;
+                    //        break;
+                    //    }
+                    //}
+                    //
+                    //if (first_end_index > -1)
+                    //{
+                    //    // find the second index
+                    //    int second_pointer_index = -1;
+                    //    for (int i = 0; i < file_data.Length - 4; i += 4)
+                    //    {
+                    //        byte[] bytes = new byte[4];
+                    //        Array.Copy(file_data, i, bytes, 0, 4);
+                    //        int j = BitConverter.ToInt32(bytes, 0);
+                    //
+                    //        if (j == first_end_index + 5)
+                    //        {
+                    //            second_pointer_index = i;
+                    //            break;
+                    //        }
+                    //    }
+                    //
+                    //    if (second_pointer_index > -1)
+                    //    {
+                    //        int first_pointer_index = second_pointer_index - 4;
+                    //        Header = new byte[first_pointer_index];
+                    //        Array.Copy(file_data, 0, Header, 0, first_pointer_index);
+                    //
+                    //        byte[] fpi = new byte[4];
+                    //        Array.Copy(file_data, first_pointer_index, fpi, 0, 4);
+                    //
+                    //        int first_string_index = BitConverter.ToInt32(fpi, 0);
+                    //        Pointers = new int[(first_string_index - first_pointer_index) / 4];
+                    //        for (int i = 0; i < Pointers.Length; i++)
+                    //        {
+                    //            byte[] bytes = new byte[4];
+                    //            Array.Copy(file_data, first_pointer_index + (i * 4), bytes, 0, 4);
+                    //            Pointers[i] = BitConverter.ToInt32(bytes, 0);
+                    //        }
+                    //        Strings = new List<string>();
+                    //        for (int i = 0; i < Pointers.Length; i++)
+                    //        {
+                    //            byte[] bytes;
+                    //            int len;
+                    //            if (i < Pointers.Length - 1)
+                    //            {
+                    //                len = Pointers[i + 1] - Pointers[i];
+                    //                bytes = new byte[len];
+                    //            }
+                    //            else
+                    //            {
+                    //                len = file_data.Length - Pointers[i];
+                    //                bytes = new byte[len];
+                    //            }
+                    //            Array.Copy(file_data, Pointers[i], bytes, 0, len);
+                    //
+                    //            string str = System.Text.Encoding.Default.GetString(bytes);
+                    //            str = str.Substring(0, str.Length - 5);
+                    //
+                    //            Strings.Add(str);
+                    //        }
+                    //    }
+                    //    else
+                    //    {
+                    //        MessageBox.Show("Not a valid Dragon Quest VIII text file.");
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    MessageBox.Show("Not a valid Dragon Quest VIII text file.");
+                    //}
 
                 }
             }
@@ -271,7 +375,7 @@ namespace DQ8TextEditor
 
                 for (int i = 0;i < Strings.Count;i++)
                 {
-                    Strings[i] = Strings[i] + "[end]";
+                    Strings[i] = Strings[i].Replace("\r\n", "\n") + "[end]";
                 }
 
                 int first_str_index = Header.Length + (Pointers.Length * 4);
