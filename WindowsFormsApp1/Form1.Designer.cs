@@ -36,14 +36,14 @@ namespace DQ8TextEditor
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.textBoxMain = new System.Windows.Forms.TextBox();
-            this.stringListBox = new System.Windows.Forms.ListBox();
-            this.buttonAdd = new System.Windows.Forms.Button();
-            this.buttonRemove = new System.Windows.Forms.Button();
             this.searchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.findToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.findInFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.replaceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.textBoxMain = new System.Windows.Forms.TextBox();
+            this.stringListBox = new System.Windows.Forms.ListBox();
+            this.buttonAdd = new System.Windows.Forms.Button();
+            this.buttonRemove = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -57,6 +57,8 @@ namespace DQ8TextEditor
             this.menuStrip1.Size = new System.Drawing.Size(737, 24);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
+            this.menuStrip1.DragDrop += new System.Windows.Forms.DragEventHandler(this.DragDropEvent);
+            this.menuStrip1.DragOver += new System.Windows.Forms.DragEventHandler(this.DragOverEvent);
             // 
             // fileToolStripMenuItem
             // 
@@ -105,43 +107,6 @@ namespace DQ8TextEditor
             this.closeToolStripMenuItem.Text = "Close";
             this.closeToolStripMenuItem.Click += new System.EventHandler(this.closeToolStripMenuItem_Click);
             // 
-            // textBoxMain
-            // 
-            this.textBoxMain.Enabled = false;
-            this.textBoxMain.Location = new System.Drawing.Point(75, 27);
-            this.textBoxMain.Multiline = true;
-            this.textBoxMain.Name = "textBoxMain";
-            this.textBoxMain.Size = new System.Drawing.Size(650, 514);
-            this.textBoxMain.TabIndex = 1;
-            this.textBoxMain.TextChanged += new System.EventHandler(this.textBoxMain_TextChanged);
-            // 
-            // stringListBox
-            // 
-            this.stringListBox.FormattingEnabled = true;
-            this.stringListBox.Location = new System.Drawing.Point(12, 27);
-            this.stringListBox.Name = "stringListBox";
-            this.stringListBox.Size = new System.Drawing.Size(57, 485);
-            this.stringListBox.TabIndex = 2;
-            this.stringListBox.SelectedIndexChanged += new System.EventHandler(this.stringListBox_SelectedIndexChanged);
-            // 
-            // buttonAdd
-            // 
-            this.buttonAdd.Location = new System.Drawing.Point(12, 518);
-            this.buttonAdd.Name = "buttonAdd";
-            this.buttonAdd.Size = new System.Drawing.Size(26, 23);
-            this.buttonAdd.TabIndex = 3;
-            this.buttonAdd.Text = "+";
-            this.buttonAdd.UseVisualStyleBackColor = true;
-            // 
-            // buttonRemove
-            // 
-            this.buttonRemove.Location = new System.Drawing.Point(43, 518);
-            this.buttonRemove.Name = "buttonRemove";
-            this.buttonRemove.Size = new System.Drawing.Size(26, 23);
-            this.buttonRemove.TabIndex = 4;
-            this.buttonRemove.Text = "-";
-            this.buttonRemove.UseVisualStyleBackColor = true;
-            // 
             // searchToolStripMenuItem
             // 
             this.searchToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -174,6 +139,47 @@ namespace DQ8TextEditor
             this.replaceToolStripMenuItem.Size = new System.Drawing.Size(217, 22);
             this.replaceToolStripMenuItem.Text = "Replace...";
             // 
+            // textBoxMain
+            // 
+            this.textBoxMain.Enabled = false;
+            this.textBoxMain.Location = new System.Drawing.Point(75, 27);
+            this.textBoxMain.Multiline = true;
+            this.textBoxMain.Name = "textBoxMain";
+            this.textBoxMain.Size = new System.Drawing.Size(650, 514);
+            this.textBoxMain.TabIndex = 1;
+            this.textBoxMain.TextChanged += new System.EventHandler(this.textBoxMain_TextChanged);
+            this.textBoxMain.DragDrop += new System.Windows.Forms.DragEventHandler(this.DragDropEvent);
+            this.textBoxMain.DragOver += new System.Windows.Forms.DragEventHandler(this.DragOverEvent);
+            // 
+            // stringListBox
+            // 
+            this.stringListBox.FormattingEnabled = true;
+            this.stringListBox.Location = new System.Drawing.Point(12, 27);
+            this.stringListBox.Name = "stringListBox";
+            this.stringListBox.Size = new System.Drawing.Size(57, 485);
+            this.stringListBox.TabIndex = 2;
+            this.stringListBox.SelectedIndexChanged += new System.EventHandler(this.stringListBox_SelectedIndexChanged);
+            this.stringListBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.DragDropEvent);
+            this.stringListBox.DragOver += new System.Windows.Forms.DragEventHandler(this.DragOverEvent);
+            // 
+            // buttonAdd
+            // 
+            this.buttonAdd.Location = new System.Drawing.Point(12, 518);
+            this.buttonAdd.Name = "buttonAdd";
+            this.buttonAdd.Size = new System.Drawing.Size(26, 23);
+            this.buttonAdd.TabIndex = 3;
+            this.buttonAdd.Text = "+";
+            this.buttonAdd.UseVisualStyleBackColor = true;
+            // 
+            // buttonRemove
+            // 
+            this.buttonRemove.Location = new System.Drawing.Point(43, 518);
+            this.buttonRemove.Name = "buttonRemove";
+            this.buttonRemove.Size = new System.Drawing.Size(26, 23);
+            this.buttonRemove.TabIndex = 4;
+            this.buttonRemove.Text = "-";
+            this.buttonRemove.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AllowDrop = true;
@@ -191,7 +197,8 @@ namespace DQ8TextEditor
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.Text = "Dragon Quest VIII 3DS Text Editor";
-            this.DragDrop += new System.Windows.Forms.DragEventHandler(this.openToolStripMenuItem_Click);
+            this.DragDrop += new System.Windows.Forms.DragEventHandler(this.DragDropEvent);
+            this.DragOver += new System.Windows.Forms.DragEventHandler(this.DragOverEvent);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);

@@ -92,6 +92,22 @@ namespace DQ8TextEditor
             saveAsToolStripMenuItem.Enabled = isReady;
             closeToolStripMenuItem.Enabled = isReady;
         }
+        private void DragOverEvent(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                e.Effect = DragDropEffects.Link;
+            else
+                e.Effect = DragDropEffects.None;
+        }
+        private void DragDropEvent(object sender, DragEventArgs e)
+        {
+            string[] files = e.Data.GetData(DataFormats.FileDrop) as string[];
+            if (files != null && files.Any())
+            {
+                tryOpenFile(files[0]);
+            }
+        }
+
     }
 
     public class MessageFile
