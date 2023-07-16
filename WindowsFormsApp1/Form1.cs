@@ -151,7 +151,29 @@ namespace DQ8TextEditor
                         }
                     }
 
-                    if (last_end_index <= -1 || penultimate_end_index <= -1)
+                    if (last_end_index > -1 && penultimate_end_index <= -1)
+                    {
+                        Header = new byte[0x10];
+                        for (int i = 0; i < Header.Length; i++)
+                        {
+                            Header[i] = file_data[i];
+                        }
+
+                        Pointers = new int[1] { 0x14 };
+
+                        Strings = new List<string>();
+                        foreach (int ptr in Pointers)
+                        {
+                            string str = Encoding.UTF8.GetString(file_data, ptr, file_data.Length - ptr);
+                            str = new Regex("[\\S\\s]*?(?=\\[end\\])").Match(str).Groups[0].Value;
+                            str = str.Replace("\n", "\r\n");
+                            Strings.Add(str);
+                        }
+
+                        return;
+                    }
+
+                    if (last_end_index <= -1 && penultimate_end_index <= -1)
                     {
                         MessageBox.Show("Not a valid Dragon Quest VIII text file.");
                         return;
